@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>독서 활동 평가서</title>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="css/styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -12,9 +12,11 @@
     <div class="header">
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsB7SXk-8PL0klrYIo_XsGYZPI98DJfOvABw&s" alt="로고">
       <span class="title">
-        2025년 책읽기와 글쓰기 리딩엠 <span class="box" contenteditable id="yearBox"></span>월 평가서
+        2025년 책읽기와 글쓰기 리딩엠 
+        <span class="box" contenteditable id="yearBox"></span>월 평가서
       </span>
     </div>
+
     <div class="info">
       <select id="schoolType">
         <option>초등학교</option><option>중학교</option>
@@ -53,9 +55,7 @@
             <td><input class="yearMonth" id="ym3_year" readonly>년 <input class="yearMonth" id="ym3_month" readonly>월</td>
           </tr>
           <tr>
-            <td><input type="number" id="val1"></td>
-            <td><input type="number" id="val2"></td>
-            <td><span id="val3">0</span></td>
+            <td><input type="number" id="val1"></td><td><input type="number" id="val2"></td><td><span id="val3">0</span></td>
           </tr>
         </table>
         <button id="btnSummary">월별 차트 표시 및 계산</button>
@@ -69,7 +69,7 @@
 
     <button id="shareBtn">페이지 생성 & 공유</button>
   </div>
-
-  <script src="script.js"></script>
+  <script src="js/script.js"></script>
 </body>
 </html>
+
