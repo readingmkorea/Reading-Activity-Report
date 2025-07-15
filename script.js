@@ -4,7 +4,7 @@
   const ctxM = document.getElementById('monthCvs').getContext('2d');
   let chartD = null, chartM = null;
 
-  // 월 초기화
+  // 월 기본값 설정
   const now = new Date();
   for (let i = 0; i < 3; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - 2 + i);
@@ -12,10 +12,9 @@
     document.getElementById(`ym${i+1}_month`).value = d.getMonth() + 1;
   }
 
-  // 글자수 카운팅
-  document.getElementById('overallComment').addEventListener('input', e => {
-    document.getElementById('charCount').textContent = e.target.value.length;
-  });
+  // 글자 수 카운터
+  document.getElementById('overallComment')
+    .addEventListener('input', e => document.getElementById('charCount').textContent = e.target.value.length);
 
   // 상세 차트
   document.getElementById('btnDetail').addEventListener('click', () => {
@@ -23,7 +22,6 @@
     const avg = keys.map(k => +document.getElementById(`${k}_avg`).value || 0);
     const total = my.reduce((a, b) => a + b, 0);
     document.getElementById('val3').textContent = total;
-
     if (!chartD) {
       chartD = new Chart(ctxD, {
         type: 'bar',
@@ -44,20 +42,17 @@
     document.getElementById('chartContainer').style.display = 'block';
   });
 
-  // 종합 차트
+  // 월별 차트
   document.getElementById('btnSummary').addEventListener('click', () => {
     const v1 = +document.getElementById('val1').value || 0;
     const v2 = +document.getElementById('val2').value || 0;
     const v3 = +document.getElementById('val3').textContent || 0;
-    const vals = [v1, v2, v3], labels = ['전전월','전월','이번달'];
-
+    const vals = [v1, v2, v3];
+    const labels = ['전전월','전월','이번달'];
     if (!chartM) {
       chartM = new Chart(ctxM, {
         type: 'bar',
-        data: {
-          labels,
-          datasets: [{ label: '월별평점', data: vals, backgroundColor: 'rgba(153,102,255,0.6)' }]
-        },
+        data: { labels, datasets: [{ label: '월별평점', data: vals, backgroundColor: 'rgba(153,102,255,0.6)' }] },
         options: { scales: { y: { beginAtZero: true, max: 100 } } }
       });
     } else {
@@ -67,47 +62,41 @@
     document.getElementById('monthChart').style.display = 'block';
   });
 
-  // 전체평점 저장/복원
+  // 전체평점 저장
   document.getElementById('saveAvgBtn').addEventListener('click', () => {
     const obj = {};
-    keys.forEach(k => obj[k + '_avg'] = document.getElementById(`${k}_avg`).value);
+    keys.forEach(k => obj[k+'_avg'] = document.getElementById(`${k}_avg`).value);
     localStorage.setItem('avgRatings', JSON.stringify(obj));
     alert('전체평점 저장됨');
   });
+
+  // 자동 복원
   const saved = JSON.parse(localStorage.getItem('avgRatings') || '{}');
   keys.forEach(k => {
     const el = document.getElementById(`${k}_avg`);
-    if (el && saved[k + '_avg'] !== undefined) el.value = saved[k + '_avg'];
+    if(el && saved[k+'_avg'] !== undefined) el.value = saved[k+'_avg'];
   });
 
-  // ✅ 완료 버튼 클리어 & 결과 새창 생성
+  // 페이지 생성 & 공유
   document.getElementById('shareBtn').addEventListener('click', () => {
     const school = document.getElementById('schoolType').value.trim();
     const grade = document.getElementById('gradeBox').textContent.trim();
     const name = document.getElementById('nameBox').textContent.trim();
-
-    // 컨테이너 복제 후 조정
-    const clone = document.querySelector('.container').cloneNode(true);
-    clone.querySelectorAll('button').forEach(btn => btn.remove());
-    clone.querySelectorAll('input, textarea').forEach(el => {
-      const span = document.createElement(el.tagName === 'TEXTAREA' ? 'p' : 'span');
-      span.textContent = el.value || el.textContent;
-      el.parentNode.replaceChild(span, el);
-    });
-
-    const popupHtml = `
-      <!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${school} ${grade} ${name} 평가서</title>
-      <style>
-        body { font-family:'Noto Sans KR','Gowun Batang'; background:#fff; padding:20px; }
-        .container { max-width:860px; margin:auto; }
-      </style></head><body><div class="container">${clone.innerHTML}</div></body></html>`;
-
-    const win = window.open('', '_blank');
-    win.document.write(popupHtml);
-    win.document.close();
+    const comment = document.getElementById('overallComment').value;
+    const html = `
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${school} ${grade} ${name} 평가서</title>
+<style>
+body{font-family:'Noto Sans KR','Gowun Batang'; padding:20px;}
+h1{text-align:center;}
+p{white-space:pre-wrap;}
+</style></head><body>
+<h1>${school} ${grade} ${name} 평가</h1>
+<h3>■ 종합평가</h3>
+<p>${comment}</p>
+</body></html>`;
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    window.open(url);
+    setTimeout(()=>URL.revokeObjectURL(url), 60000);
   });
-
 })();
-
-
-
