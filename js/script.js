@@ -76,27 +76,44 @@
     const el = document.getElementById(`${k}_avg`);
     if(el && saved[k+'_avg'] !== undefined) el.value = saved[k+'_avg'];
   });
+document.getElementById('shareBtn').addEventListener('click', () => {
+  const container = document.querySelector('.container');
+  const school = document.getElementById('schoolType').value.trim();
+  const grade  = document.getElementById('gradeBox').textContent.trim();
+  const name   = document.getElementById('nameBox').textContent.trim();
 
-  // 페이지 생성 & 공유
-  document.getElementById('shareBtn').addEventListener('click', () => {
-    const school = document.getElementById('schoolType').value.trim();
-    const grade = document.getElementById('gradeBox').textContent.trim();
-    const name = document.getElementById('nameBox').textContent.trim();
-    const comment = document.getElementById('overallComment').value;
-    const html = `
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><title>${school} ${grade} ${name} 평가서</title>
-<style>
-body{font-family:'Noto Sans KR','Gowun Batang'; padding:20px;}
-h1{text-align:center;}
-p{white-space:pre-wrap;}
-</style></head><body>
-<h1>${school} ${grade} ${name} 평가</h1>
-<h3>■ 종합평가</h3>
-<p>${comment}</p>
-</body></html>`;
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    window.open(url);
-    setTimeout(()=>URL.revokeObjectURL(url), 60000);
+  // 콘텐츠 추출 (버튼 제외)
+  const cloned = container.cloneNode(true);
+  cloned.querySelectorAll('button').forEach(btn => btn.remove());
+  cloned.querySelectorAll('input, textarea').forEach(el => {
+    const span = document.createElement(el.tagName === 'TEXTAREA' ? 'p' : 'span');
+    span.textContent = el.value || el.textContent;
+    el.parentNode.replaceChild(span, el);
+  });
+
+  // 새 창에 내용 쓰기
+  const html = `
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+      <meta charset="UTF-8">
+      <title>${school} ${grade} ${name} 평가서</title>
+      <style>
+        body { font-family:'Noto Sans KR','Gowun Batang'; background:#fff; padding:20px; }
+        .container { max-width:860px; margin:auto; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        ${cloned.innerHTML}
+      </div>
+    </body>
+    </html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+});
+
   });
 })();
