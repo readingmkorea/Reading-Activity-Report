@@ -1,8 +1,150 @@
 body {
-  font-family:'Noto Sans KR','Gowun Batang';
-  background:#f9f9f9;
-  margin:0;
-  padding:20px;
-  color:#333;
+  font-family: 'Noto Sans KR', 'Gowun Batang', serif;
+  background: #f9f9f9;
+  margin: 0;
+  padding: 20px;
+  color: #333;
 }
-/* .container, .header, .info 등 HTML 안의 모든 스타일을 여기에 복사하세요. */
+
+.container {
+  max-width: 860px;
+  background: #fff;
+  margin: auto;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.05);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.header img {
+  width: 60px;
+}
+.title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.info {
+  text-align: center;
+  margin: 20px 0;
+}
+.info select {
+  min-width: 140px;
+  padding: 4px 8px;
+  font-size: 14px;
+  margin-right: 10px;
+}
+.info .box,
+.info input[type="number"] {
+  vertical-align: middle;
+}
+
+.box {
+  width: 44px;
+  height: 26px;
+  line-height: 26px;
+  display: inline-block;
+  text-align: center;
+  border: 1px solid #888;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+#nameBox {
+  min-width: 150px;
+  margin-left: 10px;
+  padding: 3px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+select, input[type="number"], input.yearMonth {
+  text-align: center;
+  width: 60px;
+  padding: 4px;
+  margin: 0 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+th {
+  background: #6c7ae0;
+  color: #fff;
+}
+
+h3 {
+  margin-top: 30px;
+  border-bottom: 2px solid #6c7ae0;
+  padding-bottom: 6px;
+  font-size: 18px;
+  color: #444;
+}
+
+button {
+  background: #6c7ae0;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  margin: 5px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+button:hover {
+  background: #5a68c7;
+}
+
+#chartContainer, #monthChart {
+  display: none;
+  margin-top: 20px;
+}
+
+.summary-section {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+.summary-table {
+  flex: 1;
+}
+.summary-chart {
+  flex: 1;
+}
+
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.char-count {
+  text-align: right;
+  margin-bottom: 20px;
+  color: #666;
+  font-size: 13px;
+}
+
