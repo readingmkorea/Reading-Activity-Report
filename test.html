@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>독서 활동 평가서</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', 'Gowun Batang', serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 860px;
+      background: #fff;
+      margin: auto;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .header img {
+      width: 60px;
+      flex-shrink: 0;
+    }
+    .title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .info {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .info select,
+    .info input[type="number"],
+    .info .box {
+      vertical-align: middle;
+    }
+    .box {
+      width: 44px;
+      height: 26px;
+      line-height: 26px;
+      display: inline-block;
+      text-align: center;
+      border: 1px solid #888;
+      border-radius: 4px;
+      background: #fafafa;
+    }
+    select#schoolType {
+      min-width: 140px;
+      padding: 4px 8px;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    select, input[type="number"], input.yearMonth {
+      text-align: center;
+      width: 60px;
+      padding: 4px;
+      margin: 0 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    #nameBox {
+      min-width: 150px;
+      margin-left: 10px;
+      padding: 3px 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #6c7ae0;
+      color: #fff;
+    }
+    h3 {
+      margin-top: 30px;
+      border-bottom: 2px solid #6c7ae0;
+      padding-bottom: 6px;
+      font-size: 18px;
+      color: #444;
+    }
+    button {
+      background: #6c7ae0;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      margin: 5px 0;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #5a68c7;
+    }
+    #chartContainer,
+    #monthChart {
+      display: none;
+      margin-top: 20px;
+    }
+    .summary-section {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      margin-bottom: 20px;
+    }
+    .summary-table {
+      flex: 1;
+    }
+    .summary-chart {
+      flex: 1;
+    }
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .char-count {
+      text-align: right;
+      margin-bottom: 20px;
+      color: #666;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsB7SXk-8PL0klrYIo_XsGYZPI98DJfOvABw&s" alt="로고">
+    <span class="title">
+      2025년 책읽기와 글쓰기 리딩엠
+      <span class="box" contenteditable id="yearBox"></span>월 독서 활동 평가서
+    </span>
+  </div>
+
+  <div class="info">
+    <select id="schoolType">
+      <option>초등학교</option>
+      <option>중학교</option>
+    </select>
+    학년 <span class="box" contenteditable id="gradeBox"></span>
+    이름 <span class="box" contenteditable id="nameBox"></span>
+  </div>
+
+  <h3>■ 상세평가</h3>
+  <table id="evaluationTable">
+    <tr><th>분류</th><th>세부항목</th><th>평가항목</th><th>내 평점</th><th>전체평균</th></tr>
+    <tr><td rowspan="3">과제 수행</td><td>정독여부</td><td>수업도서를 완독해 오는가?</td><td><input type="number" id="s1_my"></td><td><input type="number" id="s1_avg"></td></tr>
+    <tr><td>추천도서</td><td>추천도서를 충분히 읽는가?</td><td><input type="number" id="s2_my"></td><td><input type="number" id="s2_avg"></td></tr>
+    <tr><td>독서습관</td><td>책에 흥미를 느끼는가?</td><td><input type="number" id="s3_my"></td><td><input type="number" id="s3_avg"></td></tr>
+    <tr><td rowspan="3">어휘/표현</td><td>어휘력</td><td>어휘의 뜻을 잘 이해하는가?</td><td><input type="number" id="v1_my"></td><td><input type="number" id="v1_avg"></td></tr>
+    <tr><td>표현이해</td><td>비유, 속담 이해하는가?</td><td><input type="number" id="v2_my"></td><td><input type="number" id="v2_avg"></td></tr>
+    <tr><td>서술이해</td><td>설명, 인과 등을 이해하는가?</td><td><input type="number" id="v3_my"></td><td><input type="number" id="v3_avg"></td></tr>
+    <tr><td rowspan="4">내용</td><td>배경지식</td><td>배경지식을 쌓았는가?</td><td><input type="number" id="c1_my"></td><td><input type="number" id="c1_avg"></td></tr>
+    <tr><td>중심내용</td><td>중심내용을 파악했는가?</td><td><input type="number" id="c2_my"></td><td><input type="number" id="c2_avg"></td></tr>
+    <tr><td>중심생각</td><td>중심생각을 이해했는가?</td><td><input type="number" id="c3_my"></td><td><input type="number" id="c3_avg"></td></tr>
+    <tr><td>발언</td><td>수업에 적극 발언하는가?</td><td><input type="number" id="c4_my"></td><td><input type="number" id="c4_avg"></td></tr>
+  </table>
+  <button type="button" id="saveAvgBtn">전체평점 저장</button>
+
+  <h3>■ 세부항목별 평점차트</h3>
+  <button type="button" id="btnDetail">차트 표시 및 계산</button>
+  <div id="chartContainer"><canvas id="myChart"></canvas></div>
+
+  <h3>■ 월별 종합평점 & 차트</h3>
+  <div class="summary-section">
+    <div class="summary-table">
+      <table>
+        <tr>
+          <td><input class="yearMonth" id="ym1_year" readonly>년 <input class="yearMonth" id="ym1_month" readonly>월</td>
+          <td><input class="yearMonth" id="ym2_year" readonly>년 <input class="yearMonth" id="ym2_month" readonly>월</td>
+          <td><input class="yearMonth" id="ym3_year" readonly>년 <input class="yearMonth" id="ym3_month" readonly>월</td>
+        </tr>
+        <tr>
+          <td><input type="number" id="val1"></td>
+          <td><input type="number" id="val2"></td>
+          <td><span id="val3">0</span></td>
+        </tr>
+      </table>
+      <button type="button" id="btnSummary">월별 차트 표시 및 계산</button>
+    </div>
+    <div class="summary-chart" id="monthChart"><canvas id="monthCvs"></canvas></div>
+  </div>
+
+  <h3>■ 종합평가</h3>
+  <textarea id="overallComment" maxlength="500" placeholder="선생님 의견을 최대 500자까지 입력 가능합니다."></textarea>
+  <div class="char-count"><span id="charCount">0</span>/500자</div>
+
+  <button type="button" id="downloadBtn">저장하기 (JPG)</button>
+</div>
+
+<script>
+(() => {
+  const keys = ['s1','s2','s3','v1','v2','v3','c1','c2','c3','c4'];
+  const ctxDetail = document.getElementById('myChart').getContext('2d');
+  const ctxMonth = document.getElementById('monthCvs').getContext('2d');
+  let chartDetail = null, chartMonth = null;
+
+  // 월 필드 초기화
+  const now = new Date();
+  for (let i = 0; i < 3; i++) {
+    const dt = new Date(now.getFullYear(), now.getMonth() - 2 + i);
+    document.getElementById(`ym${i+1}_year`).value = dt.getFullYear();
+    document.getElementById(`ym${i+1}_month`).value = dt.getMonth() + 1;
+  }
+
+  // 글자 수 카운팅
+  const overall = document.getElementById('overallComment');
+  const countDisplay = document.getElementById('charCount');
+  overall.addEventListener('input', () => {
+    countDisplay.textContent = overall.value.length;
+  });
+
+  // 차트 생성
+  document.getElementById('btnDetail').addEventListener('click', () => {
+    const my = keys.map(k => +document.getElementById(`${k}_my`).value || 0);
+    const avg = keys.map(k => +document.getElementById(`${k}_avg`).value || 0);
+    const total = my.reduce((sum, v) => sum + v, 0);
+    document.getElementById('val3').textContent = total;
+
+    if (!chartDetail) {
+      chartDetail = new Chart(ctxDetail, {
+        type: 'bar',
+        data: {
+          labels: ['정독','추천','습관','어휘','표현','서술','배경','중심내용','중심생각','발언'],
+          datasets: [
+            { label: '내 평점', data: my, backgroundColor: 'rgba(54,162,235,0.5)' },
+            { label: '전체평균', data: avg, backgroundColor: 'rgba(255,159,64,0.5)' }
+          ]
+        },
+        options: {
+          scales: { y: { beginAtZero: true, suggestedMax: 5 } }
+        }
+      });
+    } else {
+      chartDetail.data.datasets[0].data = my;
+      chartDetail.data.datasets[1].data = avg;
+      chartDetail.update();
+    }
+
+    document.getElementById('chartContainer').style.display = 'block';
+  });
+
+  document.getElementById('btnSummary').addEventListener('click', () => {
+    const v1 = +document.getElementById('val1').value || 0;
+    const v2 = +document.getElementById('val2').value || 0;
+    const v3 = +document.getElementById('val3').textContent || 0;
+    const vals = [v1, v2, v3];
+    const labels = ['전전월','전월','이번달'];
+
+    if (!chartMonth) {
+      chartMonth = new Chart(ctxMonth, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [
+            { label: '월별평점', data: vals, backgroundColor: 'rgba(153,102,255,0.6)' }
+          ]
+        },
+        options: {
+          scales: { y: { beginAtZero: true, max: 100 } }
+        }
+      });
+    } else {
+      chartMonth.data.datasets[0].data = vals;
+      chartMonth.update();
+    }
+
+    document.getElementById('monthChart').style.display = 'block';
+  });
+
+  // 전체평점 저장 (localStorage)
+  document.getElementById('saveAvgBtn').addEventListener('click', () => {
+    const obj = {};
+    keys.forEach(k => {
+      obj[k + '_avg'] = document.getElementById(k + '_avg').value;
+    });
+    localStorage.setItem('avgRatings', JSON.stringify(obj));
+    alert('전체평점이 저장되었습니다.');
+  });
+
+  // 저장된 전체평점 자동 복원
+  const saved = JSON.parse(localStorage.getItem('avgRatings') || '{}');
+  keys.forEach(k => {
+    const el = document.getElementById(k + '_avg');
+    if (el && saved[k + '_avg'] !== undefined) el.value = saved[k + '_avg'];
+  });
+
+  // 저장하기(JPG) 버튼
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    const target = document.querySelector('.container');
+    html2canvas(target, { scale: window.devicePixelRatio, useCORS: true })
+    .then(canvas => {
+      const school = document.getElementById('schoolType').value.trim();
+      const grade = document.getElementById('gradeBox').textContent.trim() || '학년';
+      const name = document.getElementById('nameBox').textContent.trim() || '이름';
+      const filename = `${school} ${grade} ${name}.jpg`;
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/jpeg', 0.92);
+      link.click();
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
