@@ -79,41 +79,83 @@
 document.getElementById('shareBtn').addEventListener('click', () => {
   const container = document.querySelector('.container');
   const school = document.getElementById('schoolType').value.trim();
-  const grade  = document.getElementById('gradeBox').textContent.trim();
-  const name   = document.getElementById('nameBox').textContent.trim();
+  const grade = document.getElementById('gradeBox').textContent.trim();
+  const name = document.getElementById('nameBox').textContent.trim();
 
-  // 콘텐츠 추출 (버튼 제외)
+  // 컨테이너 복제 및 버튼 제거
   const cloned = container.cloneNode(true);
   cloned.querySelectorAll('button').forEach(btn => btn.remove());
+
+  // 입력 요소 전체를 텍스트로 대체
   cloned.querySelectorAll('input, textarea').forEach(el => {
     const span = document.createElement(el.tagName === 'TEXTAREA' ? 'p' : 'span');
-    span.textContent = el.value || el.textContent;
+    span.textContent = el.value;
     el.parentNode.replaceChild(span, el);
   });
 
-  // 새 창에 내용 쓰기
+  // 새 창 HTML 구성
   const html = `
-    <!DOCTYPE html>
-    <html lang="ko">
-    <head>
-      <meta charset="UTF-8">
-      <title>${school} ${grade} ${name} 평가서</title>
-      <style>
-        body { font-family:'Noto Sans KR','Gowun Batang'; background:#fff; padding:20px; }
-        .container { max-width:860px; margin:auto; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        ${cloned.innerHTML}
-      </div>
-    </body>
-    </html>`;
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>${school} ${grade} ${name} 평가서</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family:'Noto Sans KR','Gowun Batang'; background:#fff; padding:20px; }
+    .container { max-width:860px; margin:auto; }
+    h3 { border-bottom:2px solid #6c7ae0; padding-bottom:6px; color:#444; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    ${cloned.innerHTML}
+  </div>
 
+  <script>
+    // 차트 재생성 – 상세 차트
+    (function(){
+      const ctxD = document.getElementById('myChart').getContext('2d');
+      const dataMy = [${keys.map(k => `document.getElementById('${k}_my').textContent`).join(',')}];
+      const dataAvg = [${keys.map(k => `document.getElementById('${k}_avg').textContent`).join(',')}];
+      new Chart(ctxD, {
+        type:'bar',
+        data:{
+          labels:['정독','추천','습관','어휘','표현','서술','배경','중심내용','중심생각','발언'],
+          datasets:[
+            {label:'내 평점', data:dataMy, backgroundColor:'rgba(54,162,235,0.5)'},
+            {label:'전체평균', data:dataAvg, backgroundColor:'rgba(255,159,64,0.5)'}
+          ]
+        },
+        options:{ scales:{ y:{ beginAtZero:true, suggestedMax:5 } } }
+      });
+
+      // 월별 차트
+      const ctxM = document.getElementById('monthCvs').getContext('2d');
+      const v1 = +document.getElementById('val1').textContent;
+      const v2 = +document.getElementById('val2').textContent;
+      const v3 = +document.getElementById('val3').textContent;
+      new Chart(ctxM, {
+        type:'bar',
+        data:{
+          labels:['전전월','전월','이번달'],
+          datasets:[{
+            label:'월별평점',
+            data:[v1,v2,v3],
+            backgroundColor:'rgba(153,102,255,0.6)'
+          }]
+        },
+        options:{ scales:{ y:{ beginAtZero:true, max:100 } } }
+      });
+    })();
+  </script>
+</body>
+</html>`;
+
+  // 팝업 열기
   const win = window.open('', '_blank');
   win.document.write(html);
   win.document.close();
 });
-
   });
 })();
