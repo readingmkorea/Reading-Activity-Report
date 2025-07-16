@@ -99,64 +99,67 @@
   /* --------------------------------------------------
      6. 완료(공유) 버튼 – 새 창에 차트 재렌더링
   -------------------------------------------------- */
-  document.getElementById('shareBtn').addEventListener('click', () => {
-    const school = document.getElementById('schoolType').value.trim();
-    const grade  = document.getElementById('gradeBox').textContent.trim();
-    const name   = document.getElementById('nameBox').textContent.trim();
+document.getElementById('shareBtn').addEventListener('click', () => {
+  const container = document.querySelector('.container');
+  const school = document.getElementById('schoolType').value.trim();
+  const grade  = document.getElementById('gradeBox').textContent.trim();
+  const name   = document.getElementById('nameBox').textContent.trim();
 
-    /* 6‑1) 현재 DOM 복제, 버튼 제거, input → span 으로 치환 */
-    const clone = document.querySelector('.container').cloneNode(true);
-    clone.querySelectorAll('button').forEach(b => b.remove());
-    clone.querySelectorAll('input, textarea').forEach(el => {
-      const holder = document.createElement(el.tagName === 'TEXTAREA' ? 'p' : 'span');
-      holder.textContent = (el.value || el.textContent);
-      el.parentNode.replaceChild(holder, el);
-    });
-
-    /* 6‑2) 새 창 생성 & 템플릿 주입 */
-    const win = window.open('', '_blank');
-    win.document.write(`
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <title>${school} ${grade} ${name} 평가서</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body{font-family:'Noto Sans KR','Gowun Batang';background:#fff;padding:20px;}
-    .container{max-width:860px;margin:auto;}
-    h3{border-bottom:2px solid #6c7ae0;padding-bottom:6px;}
-    table{width:100%;border-collapse:collapse;font-size:14px;margin-bottom:18px;}
-    th,td{border:1px solid #ddd;padding:8px;text-align:center;}
-    th{background:#6c7ae0;color:#fff;}
-  </style>
-</head>
-<body>
-  ${clone.outerHTML}
-
-  <script>
-    /* --- 새 창 안에서 차트 다시 그리기 --- */
-    (function(){
-      const dCtx = document.getElementById('myChart').getContext('2d');
-      const mCtx = document.getElementById('monthCvs').getContext('2d');
-
-      const myVals  = ${JSON.stringify(keys)}.map(k => +document.getElementById(k+'_my').textContent||0);
-      const avgVals = ${JSON.stringify(keys)}.map(k => +document.getElementById(k+'_avg').textContent||0);
-      new Chart(dCtx,{type:'bar',data:{labels:['정독','추천','습관','어휘','표현','서술','배경','중심내용','중심생각','발언'],
-        datasets:[{label:'내 평점',data:myVals,backgroundColor:'rgba(54,162,235,0.5)'},{label:'전체평균',data:avgVals,backgroundColor:'rgba(255,159,64,0.5)'}]},
-        options:{scales:{y:{beginAtZero:true,suggestedMax:5}}}});
-
-      const v1=+document.getElementById('val1').textContent||0,
-            v2=+document.getElementById('val2').textContent||0,
-            v3=+document.getElementById('val3').textContent||0;
-      new Chart(mCtx,{type:'bar',data:{labels:['전전월','전월','이번달'],datasets:[{label:'월별평점',data:[v1,v2,v3],backgroundColor:'rgba(153,102,255,0.6)'}]},
-        options:{scales:{y:{beginAtZero:true,max:100}}}});
-    })();
-  </script>
-</body>
-</html>`);
-    win.document.close();
+  const cloned = container.cloneNode(true);
+  cloned.querySelectorAll('button').forEach(btn => btn.remove());
+  cloned.querySelectorAll('input, textarea').forEach(el => {
+    const span = document.createElement(el.tagName === 'TEXTAREA' ? 'p' : 'span');
+    span.textContent = el.value || el.textContent;
+    el.parentNode.replaceChild(span, el);
   });
+
+  const html = `
+    <!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
+    <title>${school} ${grade} ${name} 평가서</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body{font-family:'Noto Sans KR','Gowun Batang';background:#fff;padding:20px;}
+      .container{max-width:860px;margin:auto;}
+      h3{border-bottom:2px solid #6c7ae0;padding-bottom:6px;color:#444;}
+    </style></head><body>
+      <div class="container">
+        ${cloned.innerHTML}
+      </div>
+
+      <script>
+        const keys = ['s1','s2','s3','v1','v2','v3','c1','c2','c3','c4'];
+        // 상세차트
+        const ctxD = document.getElementById('myChart').getContext('2d');
+        const dataMy = keys.map(k => +document.getElementById(k+'_my').textContent);
+        const dataAvg = keys.map(k => +document.getElementById(k+'_avg').textContent);
+        new Chart(ctxD, {
+          type:'bar',
+          data:{ labels:['정독','추천','습관','어휘','표현','서술','배경','중심내용','중심생각','발언'],
+            datasets:[
+              {label:'내 평점',data:dataMy,backgroundColor:'rgba(54,162,235,0.5)'},
+              {label:'전체평균',data:dataAvg,backgroundColor:'rgba(255,159,64,0.5)'}
+            ]},
+          options:{scales:{y:{beginAtZero:true,suggestedMax:5}}}
+        });
+        // 월별 차트
+        const ctxM = document.getElementById('monthCvs').getContext('2d');
+        const v1 = +document.getElementById('val1').textContent;
+        const v2 = +document.getElementById('val2').textContent;
+        const v3 = +document.getElementById('val3').textContent;
+        new Chart(ctxM, {
+          type:'bar',
+          data:{ labels:['전전월','전월','이번달'],
+            datasets:[{label:'월별평점',data:[v1,v2,v3],backgroundColor:'rgba(153,102,255,0.6)'}]},
+          options:{scales:{y:{beginAtZero:true,max:100}}}
+        });
+      </script>
+    </body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+});
+
 
 })();   /* 즉시실행 함수 끝 */
 
