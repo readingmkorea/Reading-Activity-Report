@@ -1,71 +1,148 @@
+<script>
+(() => {
+  const keys = ['s1','s2','s3','v1','v2','v3','c1','c2','c3','c4'];
+  const ctxD = document.getElementById('myChart').getContext('2d');
+  const ctxM = document.getElementById('monthCvs').getContext('2d');
+  let chartD = null, chartM = null;
+
+  // 월 자동 입력
+  const now = new Date();
+  for (let i = 0; i < 3; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - 2 + i);
+    document.getElementById(`ym${i+1}_year`).value = d.getFullYear();
+    document.getElementById(`ym${i+1}_month`).value = d.getMonth() + 1;
+  }
+
+  // 글자 수 카운터
+  document.getElementById('overallComment')
+    .addEventListener('input', e => document.getElementById('charCount').textContent = e.target.value.length);
+
+  // 상세 차트 생성
+  document.getElementById('btnDetail').addEventListener('click', () => {
+    const my = keys.map(k => +document.getElementById(`${k}_my`).value || 0);
+    const avg = keys.map(k => +document.getElementById(`${k}_avg`).value || 0);
+    const total = my.reduce((a, b) => a + b, 0);
+    document.getElementById('val3').textContent = total;
+    if (!chartD) {
+      chartD = new Chart(ctxD, {
+        type: 'bar',
+        data: {
+          labels: ['정독','추천','습관','어휘','표현','서술','배경','중심내용','중심생각','발언'],
+          datasets: [
+            { label: '내 평점', data: my, backgroundColor: 'rgba(54,162,235,0.5)' },
+            { label: '전체평균', data: avg, backgroundColor: 'rgba(255,159,64,0.5)' }
+          ]
+        },
+        options: { scales: { y: { beginAtZero: true, suggestedMax: 5 } } }
+      });
+    } else {
+      chartD.data.datasets[0].data = my;
+      chartD.data.datasets[1].data = avg;
+      chartD.update();
+    }
+    document.getElementById('chartContainer').style.display = 'block';
+  });
+
+  // 월별 종합 차트 생성
+  document.getElementById('btnSummary').addEventListener('click', () => {
+    const vals = [
+      +document.getElementById('val1').value || 0,
+      +document.getElementById('val2').value || 0,
+      +document.getElementById('val3').textContent || 0
+    ];
+    const labels = ['전전월','전월','이번달'];
+    if (!chartM) {
+      chartM = new Chart(ctxM, {
+        type: 'bar',
+        data: { labels, datasets: [{ label: '월별평점', data: vals, backgroundColor: 'rgba(153,102,255,0.6)' }] },
+        options: { scales: { y: { beginAtZero: true, max: 100 } } }
+      });
+    } else {
+      chartM.data.datasets[0].data = vals;
+      chartM.update();
+    }
+    document.getElementById('monthChart').style.display = 'block';
+  });
+
+  // 전체평균 저장/복원
+  document.getElementById('saveAvgBtn').addEventListener('click', () => {
+    const obj = {};
+    keys.forEach(k => obj[`${k}_avg`] = document.getElementById(`${k}_avg`).value);
+    localStorage.setItem('avgRatings', JSON.stringify(obj));
+    alert('전체평점 저장됨');
+  });
+  const saved = JSON.parse(localStorage.getItem('avgRatings') || '{}');
+  keys.forEach(k => {
+    const el = document.getElementById(`${k}_avg`);
+    if (el && saved[`${k}_avg`] !== undefined) el.value = saved[`${k}_avg`];
+  });
+
+  // 완료 버튼 (새 창에서 결과 공유)
+  document.getElementById('shareBtn').addEventListener('click', () => {
+    const container = document.querySelector('.container');
+    const school = document.getElementById('schoolType').value.trim();
+    const grade = document.getElementById('gradeBox').textContent.trim();
+    const name = document.getElementById('nameBox').textContent.trim();
+
+    const cloned = container.cloneNode(true);
+    cloned.querySelectorAll('button').forEach(btn => btn.remove());
+    cloned.querySelectorAll('input, textarea').forEach(el => {
+      const span = document.createElement(el.tagName === 'TEXTAREA' ? 'p' : 'span');
+      span.textContent = el.value || el.textContent;
+      el.parentNode.replaceChild(span, el);
+    });
+
+    const html = `
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>독서 활동 평가서</title>
-  <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <title>${school} ${grade} ${name} 평가서</title>
+  <link href="styles.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js" defer></script>
 </head>
 <body>
   <div class="container">
-    <div class="header">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsB7SXk-8PL0klrYIo_XsGYZPI98DJfOvABw&s" alt="로고">
-      <span class="title">독서 활동 평가서</span>
-    </div>
-
-    <div class="info">
-      <select id="schoolType"><option>초등학교</option><option>중학교</option></select>
-      <span class="box" contenteditable id="yearBox">월</span>
-      <span class="box" contenteditable id="gradeBox">학년</span>
-      <span class="box" contenteditable id="nameBox">이름</span>
-    </div>
-
-    <!-- 상세평가 표 -->
-    <h3>■ 상세평가</h3>
-    <table id="evaluationTable">
-      <tr><th>분류</th><th>세부항목</th><th>평가항목</th><th>내 평점</th><th>전체평균</th></tr>
-      <tr><td rowspan="3">과제 수행</td><td>정독여부</td><td>완독 여부?</td><td><input type="number" id="s1_my"></td><td><input type="number" id="s1_avg"></td></tr>
-      <tr><td>추천도서</td><td>추천도서 읽기?</td><td><input type="number" id="s2_my"></td><td><input type="number" id="s2_avg"></td></tr>
-      <tr><td>독서습관</td><td>독서습관 형성?</td><td><input type="number" id="s3_my"></td><td><input type="number" id="s3_avg"></td></tr>
-      <tr><td rowspan="3">어휘/표현</td><td>어휘력</td><td>어휘 이해?</td><td><input type="number" id="v1_my"></td><td><input type="number" id="v1_avg"></td></tr>
-      <tr><td>표현이해</td><td>속담, 비유 이해?</td><td><input type="number" id="v2_my"></td><td><input type="number" id="v2_avg"></td></tr>
-      <tr><td>서술이해</td><td>인과, 분석 이해?</td><td><input type="number" id="v3_my"></td><td><input type="number" id="v3_avg"></td></tr>
-      <tr><td rowspan="4">내용</td><td>배경지식</td><td>배경지식 증가?</td><td><input type="number" id="c1_my"></td><td><input type="number" id="c1_avg"></td></tr>
-      <tr><td>중심내용</td><td>중심내용 파악?</td><td><input type="number" id="c2_my"></td><td><input type="number" id="c2_avg"></td></tr>
-      <tr><td>중심생각</td><td>중심생각 이해?</td><td><input type="number" id="c3_my"></td><td><input type="number" id="c3_avg"></td></tr>
-      <tr><td>발언</td><td>수업 발언 여부?</td><td><input type="number" id="c4_my"></td><td><input type="number" id="c4_avg"></td></tr>
-    </table>
-
-    <button id="saveAvgBtn">전체평점 저장</button>
-
-    <!-- 차트 표시 버튼 -->
-    <h3>■ 세부항목별 평점차트</h3>
-    <button id="btnDetail">차트 표시 및 계산</button>
-    <div id="chartContainer"><canvas id="myChart"></canvas></div>
-
-    <h3>■ 월별 종합평점 & 차트</h3>
-    <div class="summary-section">
-      <div class="summary-table">
-        <table>
-          <tr><td><input class="yearMonth" id="ym1_year" readonly>년 <input class="yearMonth" id="ym1_month" readonly>월</td>
-              <td><input class="yearMonth" id="ym2_year" readonly>년 <input class="yearMonth" id="ym2_month" readonly>월</td>
-              <td><input class="yearMonth" id="ym3_year" readonly>년 <input class="yearMonth" id="ym3_month" readonly>월</td></tr>
-          <tr><td><input type="number" id="val1"></td><td><input type="number" id="val2"></td><td><span id="val3">0</span></td></tr>
-        </table>
-        <button id="btnSummary">월별 차트 표시 및 계산</button>
-      </div>
-      <div class="summary-chart" id="monthChart"><canvas id="monthCvs"></canvas></div>
-    </div>
-
-    <h3>■ 종합평가</h3>
-    <textarea id="overallComment" maxlength="500" placeholder="선생님 의견"></textarea>
-    <div class="char-count"><span id="charCount">0</span>/500자</div>
-
-    <div class="share-wrap">
-      <button id="shareBtn">완료</button>
-    </div>
+    ${cloned.innerHTML}
   </div>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const keys = ${JSON.stringify(keys)};
+      const ctxD = document.getElementById('myChart').getContext('2d');
+      const dataMy = keys.map(k => +document.getElementById(k + '_my').textContent);
+      const dataAvg = keys.map(k => +document.getElementById(k + '_avg').textContent);
+      new Chart(ctxD, {
+        type: 'bar',
+        data: {
+          labels: ['정독','추천','습관','어휘','표현','서술','배경','중심내용','중심생각','발언'],
+          datasets: [
+            { label: '내 평점', data: dataMy, backgroundColor: 'rgba(54,162,235,0.5)' },
+            { label: '전체평균', data: dataAvg, backgroundColor: 'rgba(255,159,64,0.5)' }
+          ]
+        },
+        options: { scales: { y: { beginAtZero: true, suggestedMax: 5 } } }
+      });
+      const ctxM = document.getElementById('monthCvs').getContext('2d');
+      const v1 = +document.getElementById('val1').textContent;
+      const v2 = +document.getElementById('val2').textContent;
+      const v3 = +document.getElementById('val3').textContent;
+      new Chart(ctxM, {
+        type: 'bar',
+        data: {
+          labels: ['전전월','전월','이번달'],
+          datasets: [{ label: '월별평점', data: [v1, v2, v3], backgroundColor: 'rgba(153,102,255,0.6)' }]
+        },
+        options: { scales: { y: { beginAtZero: true, max: 100 } } }
+      });
+    });
+  </script>
 </body>
-</html>
+</html>`;
+
+    const win = window.open('', '_blank');
+    win.document.write(html);
+    win.document.close();
+  });
+
+})();
+</script>
