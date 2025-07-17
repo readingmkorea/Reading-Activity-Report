@@ -1,19 +1,217 @@
-body { font-family:'Noto Sans KR','Gowun Batang'; background:#f9f9f9; margin:0; padding:20px; }
-.container { max-width:800px; margin:auto; background:#fff; padding:30px; border-radius:8px; box-shadow:0 2px 15px rgba(0,0,0,0.05); }
-.header { display:flex; align-items:center; justify-content:center; gap:8px; }
-.header img { width:50px; }
-.title { font-size:1.4rem; font-weight:bold; }
-.info { display:flex; justify-content:flex-end; gap:10px; margin:15px 0; }
-.box { min-width:60px; padding:4px 6px; border:1px solid #888; border-radius:4px; background:#fafafa; text-align:center;}
-table { width:100%; border-collapse:collapse; margin:20px 0; font-size:14px;}
-th,td { border:1px solid #ddd; padding:8px; text-align:center; }
-th { background:#6c7ae0; color:#fff; }
-h3 { margin-top:30px; font-size:1.2rem; color:#444; border-bottom:2px solid #6c7ae0; padding-bottom:6px; }
-button { background:#6c7ae0; color:#fff; border:none; padding:10px 18px; margin:8px 0; border-radius:4px; cursor:pointer; font-size:14px; }
-button:hover { background:#5a68c7; }
-.summary-section { display:flex; gap:20px; align-items:flex-start; }
-.summary-table table { margin-bottom:10px; }
-textarea { width:100%; min-height:100px; border:1px solid #ccc; border-radius:4px; padding:8px; font-size:14px; }
-.char-count { text-align:right; font-size:13px; color:#666; margin-top:-12px; }
-#chartContainer, #monthChart { display:none; margin-top:20px; }
-.share-wrap { text-align:center; margin-top:20px; }
+/* styles.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Noto+Sans+KR:wght@400;700&display=swap');
+
+body {
+  font-family: 'Noto Sans KR', 'Gowun Batang', serif;
+  background: #f9f9f9;
+  margin: 0;
+  padding: 20px;
+  color: #333;
+}
+
+.container {
+  max-width: 860px;
+  background: #fff;
+  margin: auto;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.05);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.header img {
+  width: 60px;
+  height: auto;
+}
+
+.title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.info {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.info select {
+  min-width: 140px;
+  padding: 4px 8px;
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.box {
+  width: 44px;
+  height: 26px;
+  line-height: 26px;
+  display: inline-block;
+  text-align: center;
+  border: 1px solid #888;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+#nameBox {
+  min-width: 150px;
+  margin-left: 10px;
+  padding: 3px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+select,
+input[type="number"],
+input.yearMonth {
+  text-align: center;
+  width: 60px;
+  padding: 4px;
+  margin: 0 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background: #6c7ae0;
+  color: #fff;
+}
+
+h3 {
+  margin-top: 30px;
+  border-bottom: 2px solid #6c7ae0;
+  padding-bottom: 6px;
+  font-size: 18px;
+  color: #444;
+}
+
+button {
+  background: #6c7ae0;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  margin: 10px auto;
+  display: block;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background: #5a68c7;
+}
+
+#chartContainer,
+#monthChart {
+  display: none;
+  margin-top: 20px;
+}
+
+.summary-section {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.summary-table {
+  flex: 1;
+}
+
+.summary-chart {
+  flex: 1;
+}
+
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  resize: vertical;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.char-count {
+  text-align: right;
+  margin-bottom: 20px;
+  color: #666;
+  font-size: 13px;
+}
+
+/* ===== 공유 페이지 추가 스타일 ===== */
+
+.share-container {
+  max-width: 860px;
+  margin: auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.05);
+}
+
+.share-container h3 {
+  margin-top: 20px;
+  border-bottom: 2px solid #6c7ae0;
+  padding-bottom: 6px;
+  color: #444;
+}
+
+.share-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.share-container th,
+.share-container td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.share-container th {
+  background: #6c7ae0;
+  color: #fff;
+}
+
+.share-container img {
+  display: block;
+  margin: auto;
+  width: 60px;
+  height: auto;
+}
+
+.share-container .title {
+  text-align: center;
+}
+
+.share-container .info {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
