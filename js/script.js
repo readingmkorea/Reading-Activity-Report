@@ -78,71 +78,69 @@
   });
 
   // 완료 버튼 (새 창에서 결과 공유)
-  document.getElementById('shareBtn').addEventListener('click', () => {
-    const container = document.querySelector('.container');
-    const school = document.getElementById('schoolType').value.trim();
-    const grade = document.getElementById('gradeBox').textContent.trim();
-    const name = document.getElementById('nameBox').textContent.trim();
+document.getElementById('shareBtn').addEventListener('click', () => {
+  const container = document.querySelector('.container');
+  const school = document.getElementById('schoolType').value.trim();
+  const grade = document.getElementById('gradeBox').textContent.trim();
+  const name = document.getElementById('nameBox').textContent.trim();
 
-    const cloned = container.cloneNode(true);
-    cloned.querySelectorAll('button').forEach(btn => btn.remove());
-    cloned.querySelectorAll('input, textarea').forEach(el => {
-      const span = document.createElement(el.tagName === 'TEXTAREA' ? 'p' : 'span');
-      span.textContent = el.value || el.textContent;
-      el.parentNode.replaceChild(span, el);
-    });
+  const cloned = container.cloneNode(true);
+  cloned.querySelectorAll('button').forEach(btn => btn.remove());
+  cloned.querySelectorAll('input, textarea').forEach(el => {
+    const span = document.createElement('p');
+    span.textContent = el.value || el.textContent;
+    el.parentNode.replaceChild(span, el);
+  });
 
-    const html = `
+  const html = `
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <title>${school} ${grade} ${name} 평가서</title>
-  <link href="styles.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="styles.css" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
+  <div class="share-container">
     ${cloned.innerHTML}
   </div>
   <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const keys = ${JSON.stringify(keys)};
-      const ctxD = document.getElementById('myChart').getContext('2d');
-      const dataMy = keys.map(k => +document.getElementById(k + '_my').textContent);
-      const dataAvg = keys.map(k => +document.getElementById(k + '_avg').textContent);
-      new Chart(ctxD, {
-        type: 'bar',
-        data: {
-          labels: ['정독','추천','습관','어휘','표현','서술','배경','중심내용','중심생각','발언'],
-          datasets: [
-            { label: '내 평점', data: dataMy, backgroundColor: 'rgba(54,162,235,0.5)' },
-            { label: '전체평균', data: dataAvg, backgroundColor: 'rgba(255,159,64,0.5)' }
-          ]
-        },
-        options: { scales: { y: { beginAtZero: true, suggestedMax: 5 } } }
-      });
-      const ctxM = document.getElementById('monthCvs').getContext('2d');
-      const v1 = +document.getElementById('val1').textContent;
-      const v2 = +document.getElementById('val2').textContent;
-      const v3 = +document.getElementById('val3').textContent;
-      new Chart(ctxM, {
-        type: 'bar',
-        data: {
-          labels: ['전전월','전월','이번달'],
-          datasets: [{ label: '월별평점', data: [v1, v2, v3], backgroundColor: 'rgba(153,102,255,0.6)' }]
-        },
-        options: { scales: { y: { beginAtZero: true, max: 100 } } }
-      });
+    const keys = ${JSON.stringify(keys)};
+    // 상세차트
+    const ctxD = document.getElementById('myChart').getContext('2d');
+    const my = keys.map(k => +document.getElementById(k + '_my').textContent);
+    const avg = keys.map(k => +document.getElementById(k + '_avg').textContent);
+    new Chart(ctxD, {
+      type:'bar',
+      data:{
+        labels:['정독','추천','습관','어휘','표현','서술','배경','중심내용','중심생각','발언'],
+        datasets:[
+          { label:'내 평점', data:my, backgroundColor:'rgba(54,162,235,0.5)' },
+          { label:'전체평균', data:avg, backgroundColor:'rgba(255,159,64,0.5)' }
+        ]
+      },
+      options:{ scales:{ y:{ beginAtZero:true, suggestedMax:5 } } }
+    });
+    // 월별차트
+    const ctxM = document.getElementById('monthCvs').getContext('2d');
+    const v1 = +document.getElementById('val1').textContent;
+    const v2 = +document.getElementById('val2').textContent;
+    const v3 = +document.getElementById('val3').textContent;
+    new Chart(ctxM, {
+      type:'bar',
+      data:{ labels:['전전월','전월','이번달'], datasets:[{ label:'월별평점', data:[v1,v2,v3], backgroundColor:'rgba(153,102,255,0.6)' }] },
+      options:{ scales:{ y:{ beginAtZero:true, max:100 } } }
     });
   </script>
 </body>
-</html>`;
+</html>
+`;
 
-    const win = window.open('', '_blank');
-    win.document.write(html);
-    win.document.close();
-  });
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+});
 
 })();
 </script>
