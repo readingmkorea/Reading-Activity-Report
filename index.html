@@ -1,32 +1,28 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <link rel="stylesheet" href="css/styles.css">
-<script src="js/script.js"></script>
 <head>
   <meta charset="UTF-8">
   <title>독서 활동 평가서</title>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <div class="container" id="capture">
+  <div class="container">
     <div class="header">
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTsB7SXk-8PL0klrYIo_XsGYZPI98DJfOvABw&s" alt="로고">
-      <span class="title">
-        2025년 책읽기와 글쓰기 리딩엠 
-        <span class="box" contenteditable id="yearBox"></span>월 평가서
-      </span>
+      <span class="title">독서 활동 평가서</span>
     </div>
 
     <div class="info">
-      <select id="schoolType">
-        <option>초등학교</option><option>중학교</option>
-      </select>
-      학년 <span class="box" contenteditable id="gradeBox"></span>
-      이름 <span class="box" contenteditable id="nameBox"></span>
+      <select id="schoolType"><option>초등학교</option><option>중학교</option></select>
+      <span class="box" contenteditable id="yearBox">월</span>
+      <span class="box" contenteditable id="gradeBox">학년</span>
+      <span class="box" contenteditable id="nameBox">이름</span>
     </div>
 
+    <!-- 상세평가 표 -->
     <h3>■ 상세평가</h3>
     <table id="evaluationTable">
       <tr><th>분류</th><th>세부항목</th><th>평가항목</th><th>내 평점</th><th>전체평균</th></tr>
@@ -41,8 +37,10 @@
       <tr><td>중심생각</td><td>중심생각 이해?</td><td><input type="number" id="c3_my"></td><td><input type="number" id="c3_avg"></td></tr>
       <tr><td>발언</td><td>수업 발언 여부?</td><td><input type="number" id="c4_my"></td><td><input type="number" id="c4_avg"></td></tr>
     </table>
+
     <button id="saveAvgBtn">전체평점 저장</button>
 
+    <!-- 차트 표시 버튼 -->
     <h3>■ 세부항목별 평점차트</h3>
     <button id="btnDetail">차트 표시 및 계산</button>
     <div id="chartContainer"><canvas id="myChart"></canvas></div>
@@ -51,14 +49,10 @@
     <div class="summary-section">
       <div class="summary-table">
         <table>
-          <tr>
-            <td><input class="yearMonth" id="ym1_year" readonly>년 <input class="yearMonth" id="ym1_month" readonly>월</td>
-            <td><input class="yearMonth" id="ym2_year" readonly>년 <input class="yearMonth" id="ym2_month" readonly>월</td>
-            <td><input class="yearMonth" id="ym3_year" readonly>년 <input class="yearMonth" id="ym3_month" readonly>월</td>
-          </tr>
-          <tr>
-            <td><input type="number" id="val1"></td><td><input type="number" id="val2"></td><td><span id="val3">0</span></td>
-          </tr>
+          <tr><td><input class="yearMonth" id="ym1_year" readonly>년 <input class="yearMonth" id="ym1_month" readonly>월</td>
+              <td><input class="yearMonth" id="ym2_year" readonly>년 <input class="yearMonth" id="ym2_month" readonly>월</td>
+              <td><input class="yearMonth" id="ym3_year" readonly>년 <input class="yearMonth" id="ym3_month" readonly>월</td></tr>
+          <tr><td><input type="number" id="val1"></td><td><input type="number" id="val2"></td><td><span id="val3">0</span></td></tr>
         </table>
         <button id="btnSummary">월별 차트 표시 및 계산</button>
       </div>
@@ -69,10 +63,9 @@
     <textarea id="overallComment" maxlength="500" placeholder="선생님 의견"></textarea>
     <div class="char-count"><span id="charCount">0</span>/500자</div>
 
-    <button id="shareBtn"> 완료 및 공유</button>
+    <div class="share-wrap">
+      <button id="shareBtn">완료</button>
+    </div>
   </div>
-  <script src="js/script.js"></script>
 </body>
 </html>
-
-
